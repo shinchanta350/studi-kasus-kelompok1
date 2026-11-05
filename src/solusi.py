@@ -1,15 +1,24 @@
 # ============================================================
-# Fuzzy Logic Mamdani - Penilaian Kinerja Karyawan
+# Fuzzy Logic Mamdani - Sistem Penilaian Kinerja Operator Produksi
 # Kelompok 1 | Kelas 5A Teknik Informatika | UNIPMA
-# Anggota: Yudi, Hearis Yulia Rachma, Oki, Niva
+# Anggota:
+#   1. Muhamad Sidik Wahyudi (2405101002)
+#   2. Hearis Yulia Rachma (2405101061)
+#   3. Okky Hendrawan (2405101095)
+#   4. Niva Ultiviola (2405101009)
 # ============================================================
 
+import os
+import csv
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')   # headless — tidak butuh display
+matplotlib.use('Agg')   # mode headless — simpan langsung ke file tanpa window popup
 import matplotlib.pyplot as plt
-import csv
-import os
+
+# Direktori dasar proyek agar path output selalu tepat
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+RESULTS_DIR = os.path.join(BASE_DIR, 'results')
+os.makedirs(RESULTS_DIR, exist_ok=True)
 
 # ----------------------------------------------------------
 # 1. FUNGSI KEANGGOTAAN INPUT
@@ -129,14 +138,15 @@ def infer(P, Q, D, verbose=True):
         print(f"\n{'─'*55}")
         print(f"  Input  → Produktivitas={P}, Kualitas={Q}, Kedisiplinan={D}")
         print(f"{'─'*55}")
-        print("  [Fuzzifikasi]")
+        print("  [Langkah 1: Fuzzifikasi]")
         for nama, vals in [("Produktivitas", mu_P),
                            ("Kualitas",      mu_Q),
                            ("Kedisiplinan",  mu_D)]:
             parts = ", ".join(f"{label[i]}={vals[i]:.3f}" for i in range(3))
             print(f"    {nama:15s}: {parts}")
 
-    # Aggregasi semua rule (Mamdani: clip + max)
+    # Langkah 2: Evaluasi Aturan (Operator DAN = MIN)
+    # Langkah 3: Penggabungan Area Grafik (Agregasi MAX)
     agg = np.zeros_like(Z_UNIVERSE)
 
     fired = []
@@ -150,12 +160,12 @@ def infer(P, Q, D, verbose=True):
 
     if verbose:
         CAT = ['R', 'S', 'T']
-        print(f"\n  [Evaluasi Rules — hanya yang aktif (α > 0)]")
+        print(f"\n  [Langkah 2: Evaluasi Aturan yang Aktif (α > 0)]")
         for pc, qc, dc, out, alpha in fired:
             print(f"    P={CAT[pc]} Q={CAT[qc]} D={CAT[dc]}"
                   f"  →  {out:<12s}  α={alpha:.3f}")
 
-    # Defuzzifikasi centroid
+    # Langkah 4: Penegasan Nilai Akhir (Defuzzifikasi Centroid)
     try:
         _trapz = np.trapezoid
     except AttributeError:
@@ -170,7 +180,7 @@ def infer(P, Q, D, verbose=True):
     else:              kategori = "Sangat Baik"
 
     if verbose:
-        print(f"\n  [Defuzzifikasi Centroid]")
+        print(f"\n  [Langkah 3 & 4: Defuzzifikasi Centroid]")
         print(f"    z* = {z_star:.4f}")
         print(f"    Kategori Kinerja: {kategori}")
 
@@ -183,36 +193,41 @@ def infer(P, Q, D, verbose=True):
 def visualisasi_mf():
     x = np.linspace(0, 100, 500)
 
-    fig, axes = plt.subplots(1, 2, figsize=(13, 4))
-    fig.suptitle("Fungsi Keanggotaan — Penilaian Kinerja Karyawan", fontsize=12)
+    fig, axes = plt.subplots(1, 2, figsize=(13, 4.5))
+    fig.suptitle("Fungsi Keanggotaan — Sistem Penilaian Kinerja Karyawan (Fuzzy Mamdani)", fontsize=13, fontweight='bold')
 
     # Input MF
     ax = axes[0]
-    ax.plot(x, [mf_rendah(xi) for xi in x], 'r-',  lw=2, label='Rendah')
-    ax.plot(x, [mf_sedang(xi) for xi in x], 'g-',  lw=2, label='Sedang')
-    ax.plot(x, [mf_tinggi(xi) for xi in x], 'b-',  lw=2, label='Tinggi')
-    ax.set_title("Variabel Input (Produktivitas / Kualitas / Kedisiplinan)")
-    ax.set_xlabel("Nilai Indikator (0–100)")
-    ax.set_ylabel("Derajat Keanggotaan μ")
-    ax.legend(); ax.grid(True, alpha=0.4); ax.set_ylim(-0.05, 1.1)
+    ax.plot(x, [mf_rendah(xi) for xi in x], color='#E41A1C', lw=2.2, label='Rendah')
+    ax.plot(x, [mf_sedang(xi) for xi in x], color='#1B9E77', lw=2.2, label='Sedang')
+    ax.plot(x, [mf_tinggi(xi) for xi in x], color='#377EB8', lw=2.2, label='Tinggi')
+    ax.set_title("Variabel Input (Produktivitas / Kualitas / Kedisiplinan)", fontsize=11)
+    ax.set_xlabel("Nilai Indikator (0–100)", fontsize=10)
+    ax.set_ylabel("Derajat Keanggotaan (μ)", fontsize=10)
+    ax.set_xticks([0, 20, 40, 60, 80, 100])
+    ax.legend(loc='center right', framealpha=0.9)
+    ax.grid(True, linestyle='--', alpha=0.5)
+    ax.set_ylim(-0.05, 1.08)
 
     # Output MF
     ax2 = axes[1]
-    ax2.plot(x, [mf_kurang(xi)      for xi in x], 'r-',  lw=2, label='Kurang')
-    ax2.plot(x, [mf_cukup(xi)       for xi in x], 'y-',  lw=2, label='Cukup')
-    ax2.plot(x, [mf_baik(xi)        for xi in x], 'g-',  lw=2, label='Baik')
-    ax2.plot(x, [mf_sangat_baik(xi) for xi in x], 'b-',  lw=2, label='Sangat Baik')
-    ax2.set_title("Variabel Output (Kinerja Karyawan)")
-    ax2.set_xlabel("Nilai Kinerja (0–100)")
-    ax2.set_ylabel("Derajat Keanggotaan μ")
-    ax2.legend(); ax2.grid(True, alpha=0.4); ax2.set_ylim(-0.05, 1.1)
+    ax2.plot(x, [mf_kurang(xi)      for xi in x], color='#E41A1C', lw=2.2, label='Kurang')
+    ax2.plot(x, [mf_cukup(xi)       for xi in x], color='#FF7F00', lw=2.2, label='Cukup')      # oranye kontras tinggi
+    ax2.plot(x, [mf_baik(xi)        for xi in x], color='#377EB8', lw=2.2, label='Baik')
+    ax2.plot(x, [mf_sangat_baik(xi) for xi in x], color='#4DAF4A', lw=2.2, label='Sangat Baik')
+    ax2.set_title("Variabel Output (Kategori Kinerja Karyawan)", fontsize=11)
+    ax2.set_xlabel("Nilai Kinerja (0–100)", fontsize=10)
+    ax2.set_ylabel("Derajat Keanggotaan (μ)", fontsize=10)
+    ax2.set_xticks([0, 30, 45, 60, 70, 85, 100])
+    ax2.legend(loc='center right', framealpha=0.9)
+    ax2.grid(True, linestyle='--', alpha=0.5)
+    ax2.set_ylim(-0.05, 1.08)
 
     plt.tight_layout()
-    os.makedirs('results', exist_ok=True)
-    path = 'results/visualisasi.png'
-    plt.savefig(path, dpi=150, bbox_inches='tight')
-    plt.show()
-    print(f"\n  Grafik disimpan → {path}")
+    chart_path = os.path.join(RESULTS_DIR, 'visualisasi.png')
+    plt.savefig(chart_path, dpi=200, bbox_inches='tight')
+    plt.close()
+    print(f"\n  Grafik diperbarui → {chart_path}")
 
 # ----------------------------------------------------------
 # 7. MAIN — 3 Data Pengujian
@@ -225,7 +240,7 @@ if __name__ == "__main__":
     print("=" * 55)
 
     data_uji = [
-        ("Karyawan A", 55, 72, 48),   # campuran → Cukup/Baik
+        ("Karyawan A", 55, 72, 48),   # campuran → Cukup
         ("Karyawan B", 85, 90, 88),   # tinggi semua → Sangat Baik
         ("Karyawan C", 30, 25, 40),   # rendah semua → Kurang
     ]
@@ -249,13 +264,13 @@ if __name__ == "__main__":
         print(f"  {row}")
 
     # Simpan CSV
-    os.makedirs('results', exist_ok=True)
-    with open('results/hasil-pengujian.csv', 'w', newline='', encoding='utf-8') as f:
+    csv_path = os.path.join(RESULTS_DIR, 'hasil-pengujian.csv')
+    with open(csv_path, 'w', newline='', encoding='utf-8') as f:
         w = csv.writer(f)
         w.writerow(['Nama', 'Produktivitas', 'Kualitas', 'Kedisiplinan',
                     'Nilai_Kinerja', 'Kategori'])
         w.writerows(hasil)
-    print(f"\n  CSV disimpan → results/hasil-pengujian.csv")
+    print(f"\n  CSV disimpan → {csv_path}")
 
     # Visualisasi
     visualisasi_mf()
