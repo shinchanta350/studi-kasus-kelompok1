@@ -22,7 +22,7 @@ Proyek tugas Ujian Tengah Semester (UTS) mata kuliah **Kecerdasan Buatan** yang 
 - **Latar Belakang:**  
   Dalam operasional kerja pabrik, evaluasi kinerja karyawan sering kali bersifat subjektif jika hanya mengandalkan penilaian sepihak dari atasan. Selain itu, karyawan sering memiliki nilai yang tidak hitam-putih (misalnya: hasil kerja cepat dan banyak namun kurang rapi, atau kerja berkecepatan sedang namun selalu rapi dan tepat waktu). Sistem berbasis Logika Fuzzy Mamdani dirancang untuk menggabungkan tiga indikator kinerja (*Produktivitas*, *Kualitas*, dan *Kedisiplinan*) menggunakan aturan logika sederhana (JIKA-MAKA) yang meniru pertimbangan manusiawi.
 - **Tujuan:**  
-  Menghasilkan nilai kinerja pasti ($z^*$) dan predikat kategori (*Kurang*, *Cukup*, *Baik*, *Sangat Baik*) secara konsisten, teratur, dan dapat dipertanggungjawabkan.
+  Menghasilkan nilai kinerja pasti (z*) dan predikat kategori (*Kurang*, *Cukup*, *Baik*, *Sangat Baik*) secara konsisten, teratur, dan dapat dipertanggungjawabkan.
 
 ---
 
@@ -30,31 +30,35 @@ Proyek tugas Ujian Tengah Semester (UTS) mata kuliah **Kecerdasan Buatan** yang 
 
 ### 1. Variabel Input (Skala 0–100)
 Ketiga variabel input menggunakan pola fungsi keanggotaan yang sama:
-- **Rendah:** Trapesium $[0, 0, 40, 60]$
-- **Sedang:** Segitiga $[40, 60, 80]$
-- **Tinggi:** Trapesium $[60, 80, 100, 100]$
+- **Rendah:** Trapesium [0, 0, 40, 60]
+- **Sedang:** Segitiga [40, 60, 80]
+- **Tinggi:** Trapesium [60, 80, 100, 100]
 
 ### 2. Variabel Output (Skala 0–100)
 Kategori kinerja karyawan:
-- **Kurang:** Trapesium $[0, 0, 30, 45]$
-- **Cukup:** Segitiga $[30, 45, 60]$
-- **Baik:** Segitiga $[50, 65, 80]$
-- **Sangat Baik:** Trapesium $[70, 85, 100, 100]$
+- **Kurang:** Trapesium [0, 0, 30, 45]
+- **Cukup:** Segitiga [30, 45, 60]
+- **Baik:** Segitiga [50, 65, 80]
+- **Sangat Baik:** Trapesium [70, 85, 100, 100]
 
 ### 3. Aturan Logika (27 Aturan JIKA-MAKA)
-Total kombinasi disusun dari $3 \times 3 \times 3 = 27$ aturan dengan metode penjumlahan bobot kategori:
-$$\text{Bobot: Rendah = 1, Sedang = 2, Tinggi = 3}$$
+Total kombinasi disusun dari 3 x 3 x 3 = 27 aturan dengan metode penjumlahan bobot kategori:
 
-| Total Bobot Nilai | Predikat Kategori | Contoh Kombinasi |
+> **Bobot Nilai:** Rendah = 1, Sedang = 2, Tinggi = 3
+
+| Total Bobot Nilai | Predikat Kategori | Contoh Kombinasi Indikator |
 |:---:|:---:|---|
-| **3 – 4** | **Kurang** | $1+1+1 = 3$ (R, R, R) atau $1+1+2 = 4$ (R, R, S) |
-| **5** | **Cukup** | $1+2+2 = 5$ (R, S, S) atau $1+1+3 = 5$ (R, R, T) |
-| **6 – 7** | **Baik** | $2+2+2 = 6$ (S, S, S) atau $2+2+3 = 7$ (S, S, T) |
-| **8 – 9** | **Sangat Baik** | $2+3+3 = 8$ (S, T, T) atau $3+3+3 = 9$ (T, T, T) |
+| **3 – 4** | **Kurang** | 1 + 1 + 1 = 3 (R, R, R) atau 1 + 1 + 2 = 4 (R, R, S) |
+| **5** | **Cukup** | 1 + 2 + 2 = 5 (R, S, S) atau 1 + 1 + 3 = 5 (R, R, T) |
+| **6 – 7** | **Baik** | 2 + 2 + 2 = 6 (S, S, S) atau 2 + 2 + 3 = 7 (S, S, T) |
+| **8 – 9** | **Sangat Baik** | 2 + 3 + 3 = 8 (S, T, T) atau 3 + 3 + 3 = 9 (T, T, T) |
 
 ### 4. Defuzzifikasi Centroid
-Mengubah bidang kurva gabungan menjadi satu nilai angka tegas ($z^*$):
-$$z^* = \frac{\sum (z \cdot \mu(z))}{\sum \mu(z)}$$
+Mengubah grafik area gabungan menjadi satu nilai angka pasti (z*) menggunakan rumus titik berat (Centroid):
+
+```text
+z* = ∑(z · μ(z)) / ∑μ(z)
+```
 
 ---
 
@@ -80,9 +84,9 @@ python src/solusi.py
 
 Program akan memproses alur Fuzzy Mamdani:
 1. **Langkah 1: Fuzzifikasi** — menghitung derajat keanggotaan tiap indikator.
-2. **Langkah 2: Evaluasi Aturan** — mencari aturan yang aktif ($\alpha > 0$) menggunakan operator `MIN`.
+2. **Langkah 2: Evaluasi Aturan** — mencari aturan yang aktif (alpha > 0) menggunakan operator `MIN`.
 3. **Langkah 3: Penggabungan (Agregasi)** — menyatukan kurva keluaran menggunakan operator `MAX`.
-4. **Langkah 4: Defuzzifikasi Centroid** — menghitung titik berat nilai tegas ($z^*$).
+4. **Langkah 4: Defuzzifikasi Centroid** — menghitung titik berat nilai tegas (z*).
 5. **Ekspor Hasil** — menyimpan tabel ringkasan ke `results/hasil-pengujian.csv` dan grafik ke `results/visualisasi.png`.
 
 ---
@@ -91,7 +95,7 @@ Program akan memproses alur Fuzzy Mamdani:
 
 Tiga skenario pengujian karyawan simulasi:
 
-| Nama Karyawan | Produktivitas | Kualitas | Kedisiplinan | Nilai Kinerja ($z^*$) | Predikat Kategori | Analisis Singkat |
+| Nama Karyawan | Produktivitas | Kualitas | Kedisiplinan | Nilai Kinerja (z*) | Predikat Kategori | Analisis Singkat |
 |---|:---:|:---:|:---:|:---:|:---:|---|
 | **Karyawan A** | 55 | 72 | 48 | **45.14** | **Cukup** | Kualitas baik (72), namun kedisiplinan rendah (48) menarik turun nilai akhir. |
 | **Karyawan B** | 85 | 90 | 88 | **88.33** | **Sangat Baik** | Semua indikator bernilai tinggi konsisten, memicu aturan Sangat Baik penuh. |
@@ -130,6 +134,7 @@ studi-kasus-kelompok1/
 ├── .gitignore
 ├── README.md
 ├── Studi Kasus_UTS Kelompok1.docx
+├── Studi Kasus_UTS Kelompok1.pdf
 ├── results/
 │   ├── hasil-pengujian.csv
 │   └── visualisasi.png
