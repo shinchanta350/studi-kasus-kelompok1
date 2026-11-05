@@ -1,4 +1,4 @@
-# Pojek UTS Kecerdasan Buatan dengan Studi Kasus — Sistem Penilaian Kinerja Operator Produksi
+# Pojek UTS Kecerdasan Buatan dengan Studi Kasus Sistem Penilaian Kinerja Operator Produksi
 
 Proyek tugas Ujian Tengah Semester (UTS) mata kuliah **Kecerdasan Buatan** yang mengimplementasikan **Logika Fuzzy metode Mamdani** untuk menilai kinerja operator produksi di lingkungan pabrik manufaktur secara objektif, adil, dan transparan.
 
