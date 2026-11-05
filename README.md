@@ -9,7 +9,7 @@ Proyek tugas Ujian Tengah Semester (UTS) mata kuliah **Kecerdasan Buatan** yang 
 | | |
 |---|---|
 | **Kelompok** | Kelompok 1 |
-| **Kelas** | 5A Teknik Informatika — Universitas PGRI Madiun (UNIPMA) |
+| **Kelas** | 5A Teknik Informatika, Universitas PGRI Madiun (UNIPMA) |
 | **Anggota** | 1. Muhamad Sidik Wahyudi (2405101002)<br>2. Hearis Yulia Rachma (2405101061)<br>3. Okky Hendrawan (2405101095)<br>4. Niva Ultiviola (2405101009) |
 
 ---
@@ -17,7 +17,7 @@ Proyek tugas Ujian Tengah Semester (UTS) mata kuliah **Kecerdasan Buatan** yang 
 ## Informasi Studi Kasus
 
 - **Judul Proyek:** Sistem Penilaian Kinerja Operator Produksi Menggunakan Logika Fuzzy dan Fungsi Keanggotaan
-- **Topik:** Topik 3 — Logika Fuzzy dan Fungsi Keanggotaan
+- **Topik:** Topik 3: Logika Fuzzy dan Fungsi Keanggotaan
 - **Metode AI:** Fuzzy Inference System Mamdani dengan Penegasan Nilai Titik Berat (*Centroid Defuzzification*)
 - **Latar Belakang:**  
   Dalam operasional kerja pabrik, evaluasi kinerja karyawan sering kali bersifat subjektif jika hanya mengandalkan penilaian sepihak dari atasan. Selain itu, karyawan sering memiliki nilai yang tidak hitam-putih (misalnya: hasil kerja cepat dan banyak namun kurang rapi, atau kerja berkecepatan sedang namun selalu rapi dan tepat waktu). Sistem berbasis Logika Fuzzy Mamdani dirancang untuk menggabungkan tiga indikator kinerja (*Produktivitas*, *Kualitas*, dan *Kedisiplinan*) menggunakan aturan logika sederhana (JIKA-MAKA) yang meniru pertimbangan manusiawi.
@@ -28,13 +28,13 @@ Proyek tugas Ujian Tengah Semester (UTS) mata kuliah **Kecerdasan Buatan** yang 
 
 ## Pemodelan Fuzzy
 
-### 1. Variabel Input (Skala 0–100)
+### 1. Variabel Input (Skala 0-100)
 Ketiga variabel input menggunakan pola fungsi keanggotaan yang sama:
 - **Rendah:** Trapesium [0, 0, 40, 60]
 - **Sedang:** Segitiga [40, 60, 80]
 - **Tinggi:** Trapesium [60, 80, 100, 100]
 
-### 2. Variabel Output (Skala 0–100)
+### 2. Variabel Output (Skala 0-100)
 Kategori kinerja karyawan:
 - **Kurang:** Trapesium [0, 0, 30, 45]
 - **Cukup:** Segitiga [30, 45, 60]
@@ -48,10 +48,10 @@ Total kombinasi disusun dari 3 x 3 x 3 = 27 aturan dengan metode penjumlahan bob
 
 | Total Bobot Nilai | Predikat Kategori | Contoh Kombinasi Indikator |
 |:---:|:---:|---|
-| **3 – 4** | **Kurang** | 1 + 1 + 1 = 3 (R, R, R) atau 1 + 1 + 2 = 4 (R, R, S) |
+| **3 - 4** | **Kurang** | 1 + 1 + 1 = 3 (R, R, R) atau 1 + 1 + 2 = 4 (R, R, S) |
 | **5** | **Cukup** | 1 + 2 + 2 = 5 (R, S, S) atau 1 + 1 + 3 = 5 (R, R, T) |
-| **6 – 7** | **Baik** | 2 + 2 + 2 = 6 (S, S, S) atau 2 + 2 + 3 = 7 (S, S, T) |
-| **8 – 9** | **Sangat Baik** | 2 + 3 + 3 = 8 (S, T, T) atau 3 + 3 + 3 = 9 (T, T, T) |
+| **6 - 7** | **Baik** | 2 + 2 + 2 = 6 (S, S, S) atau 2 + 2 + 3 = 7 (S, S, T) |
+| **8 - 9** | **Sangat Baik** | 2 + 3 + 3 = 8 (S, T, T) atau 3 + 3 + 3 = 9 (T, T, T) |
 
 ### 4. Defuzzifikasi Centroid
 Mengubah grafik area gabungan menjadi satu nilai angka pasti (z*) menggunakan rumus titik berat (Centroid):
@@ -83,11 +83,11 @@ python src/solusi.py
 ```
 
 Program akan memproses alur Fuzzy Mamdani:
-1. **Langkah 1: Fuzzifikasi** — menghitung derajat keanggotaan tiap indikator.
-2. **Langkah 2: Evaluasi Aturan** — mencari aturan yang aktif (alpha > 0) menggunakan operator `MIN`.
-3. **Langkah 3: Penggabungan (Agregasi)** — menyatukan kurva keluaran menggunakan operator `MAX`.
-4. **Langkah 4: Defuzzifikasi Centroid** — menghitung titik berat nilai tegas (z*).
-5. **Ekspor Hasil** — menyimpan tabel ringkasan ke `results/hasil-pengujian.csv` dan grafik ke `results/visualisasi.png`.
+1. **Langkah 1: Fuzzifikasi**: menghitung derajat keanggotaan tiap indikator.
+2. **Langkah 2: Evaluasi Aturan**: mencari aturan yang aktif (alpha > 0) menggunakan operator `MIN`.
+3. **Langkah 3: Penggabungan (Agregasi)**: menyatukan kurva keluaran menggunakan operator `MAX`.
+4. **Langkah 4: Defuzzifikasi Centroid**: menghitung titik berat nilai tegas (z*).
+5. **Ekspor Hasil**: menyimpan tabel ringkasan ke `results/hasil-pengujian.csv` dan grafik ke `results/visualisasi.png`.
 
 ---
 
